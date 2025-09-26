@@ -1,0 +1,128 @@
+apiVersion: skaffold/v4beta1
+kind: Config
+metadata:
+  name: wemind-microservices
+
+build:
+  tagPolicy:
+    gitCommit: {}
+  artifacts:
+    # Default artifacts for local development
+    - image: auth-service
+      context: .
+      docker:
+        dockerfile: Dockerfile
+        target: auth-service-dev
+      sync:
+        manual:
+          # Fix: Use glob patterns with correct absolute paths
+          - {
+              src: "auth-service/src/**/*",
+              dest: "/usr/src/app/auth-service/src",
+              strip: "auth-service/src/",
+            }
+          - {
+              src: "auth-service/nodemon.json",
+              dest: "/usr/src/app/auth-service/nodemon.json",
+            }
+          - {
+              src: "auth-service/package.json",
+              dest: "/usr/src/app/auth-service/package.json",
+            }
+    - image: billing-service
+      context: .
+      docker:
+        dockerfile: Dockerfile
+        target: billing-service-dev
+      sync:
+        manual:
+          # Fix: Use glob patterns with correct absolute paths
+          - {
+              src: "billing-service/src/**/*",
+              dest: "/usr/src/app/billing-service/src",
+              strip: "billing-service/src/",
+            }
+          - {
+              src: "billing-service/nodemon.json",
+              dest: "/usr/src/app/billing-service/nodemon.json",
+            }
+          - {
+              src: "billing-service/package.json",
+              dest: "/usr/src/app/billing-service/package.json",
+            }
+  local:
+    push: false
+
+deploy:
+  helm:
+    releases:
+      - name: keda
+        repo: https://kedacore.github.io/charts
+        remoteChart: keda
+        version: 2.17.2
+        namespace: keda
+        createNamespace: true
+      - name: keda-http-add-on
+        repo: https://kedacore.github.io/charts
+        remoteChart: keda-add-ons-http
+        version: 0.10.0
+        namespace: keda
+        # Removed waitForDeployments as it's not supported in v4beta1
+
+  kubectl: {}
+
+profiles:
+  - name: enable-push
+    activation:
+      - env: PUSH_IMAGE=true
+    build:
+      local:
+        push: true
+
+  - name: local
+    manifests:
+      kustomize:
+        paths:
+          - .k8s/overlays/local
+
+  - name: development
+    build:
+      artifacts:
+        - image: "{{.IMAGE_REPO}}/auth-service"
+          context: .
+          docker: { dockerfile: Dockerfile, target: auth-service-prod }
+        - image: "{{.IMAGE_REPO}}/billing-service"
+          context: .
+          docker: { dockerfile: Dockerfile, target: billing-service-prod }
+    manifests:
+      kustomize:
+        paths:
+          - .k8s/overlays/development
+
+  - name: staging
+    build:
+      artifacts:
+        - image: "{{.IMAGE_REPO}}/auth-service"
+          context: .
+          docker: { dockerfile: Dockerfile, target: auth-service-prod }
+        - image: "{{.IMAGE_REPO}}/billing-service"
+          context: .
+          docker: { dockerfile: Dockerfile, target: billing-service-prod }
+    manifests:
+      kustomize:
+        paths:
+          - .k8s/overlays/staging
+
+  - name: production
+    build:
+      artifacts:
+        - image: "{{.IMAGE_REPO}}/auth-service"
+          context: .
+          docker: { dockerfile: Dockerfile, target: auth-service-prod }
+        - image: "{{.IMAGE_REPO}}/billing-service"
+          context: .
+          docker: { dockerfile: Dockerfile, target: billing-service-prod }
+    manifests:
+      kustomize:
+        paths:
+          - .k8s/overlays/production

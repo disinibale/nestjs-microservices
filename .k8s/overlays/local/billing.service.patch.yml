@@ -1,0 +1,24 @@
+# .k8s/overlays/local/billing.service.patch.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: billing-service-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: billing-service
+          image: billing-service
+          imagePullPolicy: Never
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          env:
+            - name: NODE_ENV
+              value: "development"
+            - name: PORT
+              value: "3002"

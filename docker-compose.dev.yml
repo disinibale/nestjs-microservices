@@ -1,0 +1,34 @@
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: auth-service-dev # <-- Point to the correct development stage
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+    develop:
+      watch:
+        - action: sync
+          path: ./auth-service
+          target: /usr/src/app/auth-service
+          ignore:
+            - node_modules/
+
+  billing-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: billing-service-dev # <-- Point to the correct development stage
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+    develop:
+      watch:
+        - action: sync
+          path: ./billing-service
+          target: /usr/src/app/billing-service
+          ignore:
+            - node_modules/

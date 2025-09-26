@@ -1,0 +1,20 @@
+# .dockerignore
+
+# Ignore IDE and OS files
+.vscode
+.idea
+.DS_Store
+
+# Ignore git folders at any level
+**/.git
+.gitignore
+
+# Ignore node_modules at any level, as pnpm installs them inside the container
+**/node_modules
+
+# Ignore build artifacts at any level
+**/dist
+
+# Ignore local environment files and logs
+*.env
+npm-debug.log

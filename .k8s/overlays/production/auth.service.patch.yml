@@ -1,0 +1,23 @@
+# .k8s/overlays/production/auth.service.patch.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service-deployment
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: auth-service
+          image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/auth-service:latest # Need to update this with our actual ECR image URI
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          env:
+            - name: NODE_ENV
+              value: "production"

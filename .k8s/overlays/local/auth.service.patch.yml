@@ -1,0 +1,24 @@
+# .k8s/overlays/local/auth.service.patch.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: auth-service
+          image: auth-service
+          imagePullPolicy: Never
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          env:
+            - name: NODE_ENV
+              value: "development"
+            - name: PORT
+              value: "3001"

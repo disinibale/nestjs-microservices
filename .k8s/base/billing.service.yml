@@ -1,0 +1,12 @@
+# .k8s/base/billing.service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-service
+spec:
+  selector:
+    app: billing-service
+  ports:
+    - protocol: TCP
+      port: 3002
+      targetPort: 3002

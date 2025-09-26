@@ -1,0 +1,38 @@
+services:
+  nginx-gateway:
+    image: nginx:stable-alpine
+    container_name: nginx-gateway
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - auth-service
+      - billing-service
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: auth-service-prod # <-- Point to the correct production stage
+    container_name: auth-service
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    restart: unless-stopped
+    expose:
+      - "3001"
+
+  billing-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: billing-service-prod # <-- Point to the correct production stage
+    container_name: billing-service
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+    restart: unless-stopped
+    expose:
+      - "3002"
