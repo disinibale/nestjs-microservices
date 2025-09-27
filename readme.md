@@ -94,5 +94,3 @@ The `skaffold.yml` includes Helm chart definitions for **KEDA** and its HTTP add
 
 - **KEDA's Role** — scale deployments in and out based on HTTP requests and other event sources.
 - **Integration** — Skaffold deploys KEDA automatically so HTTP-driven scaling rules can be added without manual setup.
-
-Generated documentation for wemind microservices. If you want this exported to a downloadable HTML file, a PDF, or converted into a GitHub README, tell me which format and I will prepare it.
